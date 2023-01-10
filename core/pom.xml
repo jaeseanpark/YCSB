@@ -39,6 +39,11 @@ LICENSE file.
       <version>4.1.0-incubating</version>
     </dependency>
     <dependency>
+      <groupId>org.hdrhistogram</groupId>
+      <artifactId>HdrHistogram</artifactId>
+      <version>2.1.4</version>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
       <version>${jackson.api.version}</version>
@@ -53,11 +58,6 @@ LICENSE file.
       <artifactId>testng</artifactId>
       <version>6.1.1</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hdrhistogram</groupId>
-      <artifactId>HdrHistogram</artifactId>
-      <version>2.1.4</version>
     </dependency>
   </dependencies>
 
