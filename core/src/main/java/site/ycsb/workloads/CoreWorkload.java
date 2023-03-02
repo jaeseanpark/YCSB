@@ -569,9 +569,11 @@ public class CoreWorkload extends Workload {
   /**
    * Builds values for all fields.
    */
+  //ANCHOR - build values 
   private HashMap<String, ByteIterator> buildValues(String key) {
     HashMap<String, ByteIterator> values = new HashMap<>();
-
+    int count = 0;
+    // String defaultvalue = "a".repeat(100);
     for (String fieldkey : fieldnames) {
       ByteIterator data;
       if (dataintegrity) {
@@ -579,8 +581,16 @@ public class CoreWorkload extends Workload {
       } else {
         // fill with random data
         data = new RandomByteIterator(fieldlengthgenerator.nextValue().longValue());
+        // System.out.println("data: " + data);
+        // if (count < 5) {
+        //   data = new RandomByteIterator(fieldlengthgenerator.nextValue().longValue());
+        // }
+        // else {
+        //   data = defaultvalue;
+        // }
       }
       values.put(fieldkey, data);
+      count++;
     }
     return values;
   }
@@ -609,12 +619,13 @@ public class CoreWorkload extends Workload {
    * for each other, and it will be difficult to reach the target throughput. Ideally, this function would
    * have no side effects other than DB operations.
    */
+  //ANCHOR - YCSB value generation in doinsert
   @Override
   public boolean doInsert(DB db, Object threadstate) {
     int keynum = keysequence.nextValue().intValue();
     String dbkey = CoreWorkload.buildKeyName(keynum, zeropadding, orderedinserts);
     HashMap<String, ByteIterator> values = buildValues(dbkey);
-
+    // System.out.println("YCSB: key: [" + dbkey + "] values : [" + values + "]");
     Status status;
     int numOfRetries = 0;
     do {

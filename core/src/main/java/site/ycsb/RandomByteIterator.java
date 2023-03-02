@@ -16,7 +16,9 @@
  */
 package site.ycsb;
 
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.ThreadLocalRandom;
+import java.io.IOException;
 
 /**
  *  A ByteIterator that generates a random sequence of bytes.
@@ -33,6 +35,7 @@ public class RandomByteIterator extends ByteIterator {
   }
 
   private void fillBytesImpl(byte[] buffer, int base) {
+    // System.out.println("__fillBytesImpl");
     int bytes = ThreadLocalRandom.current().nextInt();
 
     switch (buffer.length - base) {
@@ -51,9 +54,11 @@ public class RandomByteIterator extends ByteIterator {
     case 0:
       break;
     }
+    // System.out.println("buffer: " + buffer);
   }
 
   private void fillBytes() {
+    // System.out.println("_fillBytes");
     if (bufOff == buf.length) {
       fillBytesImpl(buf, 0);
       bufOff = 0;
@@ -62,6 +67,7 @@ public class RandomByteIterator extends ByteIterator {
   }
 
   public RandomByteIterator(long len) {
+    // System.out.println("RandomByteIterator");
     this.len = len;
     this.buf = new byte[6];
     this.bufOff = buf.length;
@@ -77,6 +83,7 @@ public class RandomByteIterator extends ByteIterator {
 
   @Override
   public int nextBuf(byte[] buffer, int bufOffset) {
+    // System.out.println("__nextBuf");
     int ret;
     if (len - off < buffer.length - bufOffset) {
       ret = (int) (len - off);
@@ -102,16 +109,43 @@ public class RandomByteIterator extends ByteIterator {
   }
 
   /** Consumes remaining contents of this object, and returns them as a byte array. */
+  //ANCHOR - return "a" bytes
   public byte[] toArray() {
-    long left = bytesLeft();
+    // System.out.println("___toArray()");
+    long left = bytesLeft();  // left = 100
+    /* change left / 2 accordingly to adjust compression ratio 
+       ex) 3 for 33% 4 for 25%... etc */
+    int compressionRatio = (int) left / 2;
+
     if (left != (int) left) {
       throw new ArrayIndexOutOfBoundsException("Too much data to fit in one array!");
     }
-    byte[] ret = new byte[(int) left];
+    byte[] tmp1 = new byte[(int) left - compressionRatio]; // array for holding random data
+    byte[] tmp2 = new byte[compressionRatio]; // array for holding "a" data
+
+    // assign random values in tmp1
     int bufOffset = 0;
-    while (bufOffset < ret.length) {
-      bufOffset = nextBuf(ret, bufOffset);
+    while (bufOffset < tmp1.length) {
+      bufOffset = nextBuf(tmp1, bufOffset);
     }
+
+    //assign "a" values in tmp2 
+    String s = "a".repeat(tmp2.length);
+    tmp2= s.getBytes();
+
+    //concatenate two byte arrays into ret
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    try{
+      outputStream.write(tmp1);
+      outputStream.write(tmp2);
+    } catch (IOException e){
+      System.out.println(e);
+    }
+    byte[] ret = outputStream.toByteArray();
+
+    // System.out.println("len: " + ret.length);
+    // System.out.println("midway: " + new String(ret));
+
     return ret;
   }
 
