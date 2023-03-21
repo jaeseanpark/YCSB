@@ -533,16 +533,13 @@ public final class Client {
       System.err.print(" " + arg);
     }
     System.err.println();
-
     Properties fileprops = new Properties();
     int argindex = 0;
-
     if (args.length == 0) {
       usageMessage();
       System.out.println("At least one argument specifying a workload is required.");
       System.exit(0);
     }
-
     while (args[argindex].startsWith("-")) {
       if (args[argindex].compareTo("-threads") == 0) {
         argindex++;
@@ -600,7 +597,6 @@ public final class Client {
         }
         String propfile = args[argindex];
         argindex++;
-
         Properties myfileprops = new Properties();
         try {
           myfileprops.load(new FileInputStream(propfile));
@@ -609,14 +605,12 @@ public final class Client {
           System.out.println(e.getMessage());
           System.exit(0);
         }
-
         //Issue #5 - remove call to stringPropertyNames to make compilable under Java 1.5
         for (Enumeration e = myfileprops.propertyNames(); e.hasMoreElements();) {
           String prop = (String) e.nextElement();
 
           fileprops.setProperty(prop, myfileprops.getProperty(prop));
         }
-
       } else if (args[argindex].compareTo("-p") == 0) {
         argindex++;
         if (argindex >= args.length) {
@@ -630,22 +624,32 @@ public final class Client {
           System.out.println("Argument '-p' expected to be in key=value format (e.g., -p operationcount=99999)");
           System.exit(0);
         }
-
         String name = args[argindex].substring(0, eq);
         String value = args[argindex].substring(eq + 1);
         props.put(name, value);
         argindex++;
+        //SECTION: compression option parsing 
+      } else if (args[argindex].compareTo("-compression") == 0) {
+        argindex++;
+        if (argindex >= args.length) {
+          usageMessage();
+          System.out.println("Missing argument value for -compression");
+          System.exit(0);
+        }
+        int comprate = Integer.parseInt(args[argindex]);
+        System.out.println("!!!!!!!compression ratio: " + comprate + "%!!!!!!!!!");
+        //props.setProperty(TARGET_PROPERTY, String.valueOf(ttarget));
+        argindex++;
+        //!SECTION
       } else {
         usageMessage();
         System.out.println("Unknown option " + args[argindex]);
         System.exit(0);
       }
-
       if (argindex >= args.length) {
         break;
       }
     }
-
     if (argindex != args.length) {
       usageMessage();
       if (argindex < args.length) {
@@ -657,23 +661,18 @@ public final class Client {
       }
       System.exit(0);
     }
-
     //overwrite file properties with properties from the command line
-
     //Issue #5 - remove call to stringPropertyNames to make compilable under Java 1.5
     for (Enumeration e = props.propertyNames(); e.hasMoreElements();) {
       String prop = (String) e.nextElement();
 
       fileprops.setProperty(prop, props.getProperty(prop));
     }
-
     props = fileprops;
-
     if (!checkRequiredProperties(props)) {
       System.out.println("Failed check required properties.");
       System.exit(0);
     }
-
     return props;
   }
 }

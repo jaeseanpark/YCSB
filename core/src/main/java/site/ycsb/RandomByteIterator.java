@@ -115,7 +115,8 @@ public class RandomByteIterator extends ByteIterator {
     long left = bytesLeft();  // left = 100
     /* change left / 2 accordingly to adjust compression ratio 
        ex) 3 for 33% 4 for 25%... etc */
-    int compressionRatio = (int) left / 2;
+    // int compressionRatio = (int) left / 2;
+    int compressionRatio = 0;
 
     if (left != (int) left) {
       throw new ArrayIndexOutOfBoundsException("Too much data to fit in one array!");
